@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/Ezzy77/audioScript-server/internal"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/transcribe"
 	"log"
 	"net/http"
 	"os"
@@ -21,9 +23,11 @@ type config struct {
 // application struct holds dependencies for http
 // handler and middleware
 type application struct {
-	config    config
-	awsConfig *internal.AwsConfigurations
-	logger    *log.Logger
+	config           config
+	awsConfig        *internal.AwsConfigurations
+	logger           *log.Logger
+	s3Client         *s3.Client
+	transcribeClient *transcribe.Client
 }
 
 func main() {
@@ -31,6 +35,18 @@ func main() {
 	awsConfig, err := internal.LoadConfig()
 	if err != nil {
 		fmt.Printf("Error loading config: %v", err)
+		os.Exit(1) // Or however you wish to handle this error
+	}
+
+	// creating aws s3 and transcribeClient
+	s3Client, transcribeClient, err := internal.InitAwsServices(
+		awsConfig.AccessKey,
+		awsConfig.SecretKey,
+		awsConfig.Region,
+	)
+
+	if err != nil {
+		fmt.Printf("Error initializing AWS services: %v", err)
 		os.Exit(1) // Or however you wish to handle this error
 	}
 
@@ -44,9 +60,11 @@ func main() {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	app := &application{
-		config:    cfg,
-		logger:    logger,
-		awsConfig: awsConfig,
+		config:           cfg,
+		logger:           logger,
+		awsConfig:        awsConfig,
+		s3Client:         s3Client,
+		transcribeClient: transcribeClient,
 	}
 
 	server := &http.Server{
