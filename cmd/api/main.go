@@ -25,6 +25,7 @@ type config struct {
 type application struct {
 	config           config
 	awsConfig        *internal.AwsConfigurations
+	supabaseConfig   *internal.SupabaseConfig
 	logger           *log.Logger
 	s3Client         *s3.Client
 	transcribeClient *transcribe.Client
@@ -35,7 +36,13 @@ func main() {
 	awsConfig, err := internal.LoadConfig()
 	if err != nil {
 		fmt.Printf("Error loading config: %v", err)
-		os.Exit(1) // Or however you wish to handle this error
+		os.Exit(1)
+	}
+
+	supabaseConfig, err := internal.LoadSupabaseConfig()
+	if err != nil {
+		fmt.Printf("Error loading Supabase config: %v", err)
+		os.Exit(1)
 	}
 
 	// creating aws s3 and transcribeClient
@@ -63,6 +70,7 @@ func main() {
 		config:           cfg,
 		logger:           logger,
 		awsConfig:        awsConfig,
+		supabaseConfig:   supabaseConfig,
 		s3Client:         s3Client,
 		transcribeClient: transcribeClient,
 	}

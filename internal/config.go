@@ -13,6 +13,26 @@ type AwsConfigurations struct {
 	OutputBucket string
 }
 
+type SupabaseConfig struct {
+	ApiUrl string
+	ApiKey string
+}
+
+func LoadSupabaseConfig() (*SupabaseConfig, error) {
+	var conf SupabaseConfig
+	viper.SetEnvPrefix("supabase")
+	viper.AutomaticEnv()
+
+	// Set specific variables
+	conf.ApiUrl = viper.GetString("API_URL")
+	conf.ApiKey = viper.GetString("API_KEY")
+
+	if conf.ApiUrl == "" || conf.ApiKey == "" {
+		return nil, errors.New("Supabase configuration could not be loaded, check your environment variables")
+	}
+	return &conf, nil
+}
+
 func LoadConfig() (*AwsConfigurations, error) {
 	var conf AwsConfigurations
 
