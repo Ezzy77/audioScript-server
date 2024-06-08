@@ -13,5 +13,6 @@ func (app *application) routes() *gin.Engine {
 	router.Use(cors.New(corsConfig))
 
 	router.POST("/v1/api/transcript", app.createTranscriptJobHandler)
+	router.POST("/v1/api/upload", app.uploadMedia)
 	return router
 }
