@@ -7,9 +7,11 @@ import (
 
 type AwsConfigurations struct {
 	AWS struct {
-		AccessKey string
-		SecretKey string
-		Region    string
+		AccessKey    string
+		SecretKey    string
+		Region       string
+		MediaFileUri string
+		OutputBucket string
 	}
 }
 
@@ -23,9 +25,11 @@ func LoadConfig() (*AwsConfigurations, error) {
 	conf.AWS.AccessKey = viper.GetString("ACCESS_KEY_ID")
 	conf.AWS.SecretKey = viper.GetString("SECRET_ACCESS_KEY")
 	conf.AWS.Region = viper.GetString("REGION")
+	conf.AWS.MediaFileUri = viper.GetString("MEDIA_FILE_URI")
+	conf.AWS.OutputBucket = viper.GetString("OUTPUT_BUCKET")
 
 	// Check that all fields have been populated.
-	if conf.AWS.AccessKey == "" || conf.AWS.SecretKey == "" || conf.AWS.Region == "" {
+	if conf.AWS.AccessKey == "" || conf.AWS.SecretKey == "" || conf.AWS.Region == "" || conf.AWS.MediaFileUri == "" || conf.AWS.OutputBucket == "" {
 		return nil, errors.New("configuration could not be loaded, check your environment variables")
 	}
 	return &conf, nil

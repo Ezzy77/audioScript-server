@@ -11,96 +11,98 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/transcribe"
 	"github.com/aws/aws-sdk-go-v2/service/transcribe/types"
-	"log"
 	"net/url"
 	"path"
 	"time"
 )
 
-func Job(awsAccessKey, awsSecretKey, awsRegion string) model.Transcription {
+//func Job(awsAccessKey, awsSecretKey, awsRegion string) model.Transcription {
+//
+//	// load shared aws configuration
+//	cfg, err := config.LoadDefaultConfig(context.TODO(),
+//		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(awsAccessKey, awsSecretKey, "")),
+//		config.WithRegion(awsRegion),
+//	)
+//	if err != nil {
+//		log.Fatalf("failed to load configuration, %v", err)
+//	}
+//
+//	// Create an S3 client
+//	s3Client := s3.NewFromConfig(cfg)
+//	transcribeClient := transcribe.NewFromConfig(cfg)
+//
+//	transcriptionJobName := "myTranscriptionJobElisio" + time.Now().Format("20060102150405")
+//
+//	_, err = transcribeClient.StartTranscriptionJob(context.TODO(), &transcribe.StartTranscriptionJobInput{
+//		Media: &types.Media{
+//			MediaFileUri: aws.String("s3://myelisiobucket/tictactoe_trimmed.mp4"),
+//		},
+//		TranscriptionJobName: aws.String(transcriptionJobName),
+//		OutputBucketName:     aws.String("output99"),
+//		LanguageCode:         types.LanguageCode.Values("en-US")[0],
+//	})
+//
+//	if err != nil {
+//		log.Fatalf("failed to start transcription job, %v", err)
+//	}
+//
+//	for {
+//		output, err := transcribeClient.GetTranscriptionJob(context.TODO(), &transcribe.GetTranscriptionJobInput{
+//			TranscriptionJobName: aws.String(transcriptionJobName),
+//		})
+//
+//		if err != nil {
+//			log.Fatalf("failed to get transcription job, %v", err)
+//		}
+//
+//		switch output.TranscriptionJob.TranscriptionJobStatus {
+//		case types.TranscriptionJobStatusCompleted:
+//			// The job is completed, print the transcript
+//			//fmt.Println(output.TranscriptionJob.Transcript.TranscriptFileUri)
+//
+//			transcriptFileUri := *output.TranscriptionJob.Transcript.TranscriptFileUri
+//			parsedUri, err := url.Parse(transcriptFileUri)
+//			if err != nil {
+//				log.Fatalf("failed to parse transcript file URI, %v", err)
+//			}
+//
+//			transcriptFileName := path.Base(parsedUri.Path)
+//
+//			// Get the object
+//			getObjectOutput, err := s3Client.GetObject(context.TODO(), &s3.GetObjectInput{
+//				Bucket: aws.String("output99"), // replace with your bucket name
+//				Key:    aws.String(transcriptFileName),
+//			})
+//
+//			if err != nil {
+//				log.Fatalf("failed to get object, %v", err)
+//			}
+//
+//			// Decode the JSON content of the object
+//			var transcript model.Transcription
+//
+//			err = json.NewDecoder(getObjectOutput.Body).Decode(&transcript)
+//			if err != nil {
+//				log.Fatalf("failed to decode JSON, %v", err)
+//			}
+//			return transcript
+//		case types.TranscriptionJobStatusFailed:
+//			log.Fatalf("transcription job failed")
+//		case types.TranscriptionJobStatusInProgress:
+//			// The job is still in progress, wait for a while before checking the status again
+//			fmt.Println("Transcription job is still in progress")
+//			time.Sleep(5 * time.Second)
+//		default:
+//			log.Fatalf("unknown transcription job status: %v", output.TranscriptionJob.TranscriptionJobStatus)
+//		}
+//	}
+//
+//}
 
-	// load shared aws configuration
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(awsAccessKey, awsSecretKey, "")),
-		config.WithRegion(awsRegion),
-	)
-	if err != nil {
-		log.Fatalf("failed to load configuration, %v", err)
-	}
-
-	// Create an S3 client
-	s3Client := s3.NewFromConfig(cfg)
-	transcribeClient := transcribe.NewFromConfig(cfg)
-
-	transcriptionJobName := "myTranscriptionJobElisio" + time.Now().Format("20060102150405")
-
-	_, err = transcribeClient.StartTranscriptionJob(context.TODO(), &transcribe.StartTranscriptionJobInput{
-		Media: &types.Media{
-			MediaFileUri: aws.String("s3://myelisiobucket/tictactoe_trimmed.mp4"),
-		},
-		TranscriptionJobName: aws.String(transcriptionJobName),
-		OutputBucketName:     aws.String("output99"),
-		LanguageCode:         types.LanguageCode.Values("en-US")[0],
-	})
-
-	if err != nil {
-		log.Fatalf("failed to start transcription job, %v", err)
-	}
-
-	for {
-		output, err := transcribeClient.GetTranscriptionJob(context.TODO(), &transcribe.GetTranscriptionJobInput{
-			TranscriptionJobName: aws.String(transcriptionJobName),
-		})
-
-		if err != nil {
-			log.Fatalf("failed to get transcription job, %v", err)
-		}
-
-		switch output.TranscriptionJob.TranscriptionJobStatus {
-		case types.TranscriptionJobStatusCompleted:
-			// The job is completed, print the transcript
-			//fmt.Println(output.TranscriptionJob.Transcript.TranscriptFileUri)
-
-			transcriptFileUri := *output.TranscriptionJob.Transcript.TranscriptFileUri
-			parsedUri, err := url.Parse(transcriptFileUri)
-			if err != nil {
-				log.Fatalf("failed to parse transcript file URI, %v", err)
-			}
-
-			transcriptFileName := path.Base(parsedUri.Path)
-
-			// Get the object
-			getObjectOutput, err := s3Client.GetObject(context.TODO(), &s3.GetObjectInput{
-				Bucket: aws.String("output99"), // replace with your bucket name
-				Key:    aws.String(transcriptFileName),
-			})
-
-			if err != nil {
-				log.Fatalf("failed to get object, %v", err)
-			}
-
-			// Decode the JSON content of the object
-			var transcript model.Transcription
-
-			err = json.NewDecoder(getObjectOutput.Body).Decode(&transcript)
-			if err != nil {
-				log.Fatalf("failed to decode JSON, %v", err)
-			}
-			return transcript
-		case types.TranscriptionJobStatusFailed:
-			log.Fatalf("transcription job failed")
-		case types.TranscriptionJobStatusInProgress:
-			// The job is still in progress, wait for a while before checking the status again
-			fmt.Println("Transcription job is still in progress")
-			time.Sleep(5 * time.Second)
-		default:
-			log.Fatalf("unknown transcription job status: %v", output.TranscriptionJob.TranscriptionJobStatus)
-		}
-	}
-
-}
-
-func InitAwsServices(awsAccessKey, awsSecretKey, awsRegion string) (*s3.Client, *transcribe.Client, error) {
+func InitAwsServices(awsAccessKey,
+	awsSecretKey,
+	awsRegion string,
+) (*s3.Client, *transcribe.Client, error) {
 	cfg, err := config.LoadDefaultConfig(
 		context.TODO(),
 		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(awsAccessKey, awsSecretKey, "")),
@@ -118,8 +120,21 @@ func InitAwsServices(awsAccessKey, awsSecretKey, awsRegion string) (*s3.Client, 
 	return s3Client, transcribeClient, nil
 }
 
-func StartJob(transcribeClient *transcribe.Client, s3Client *s3.Client, awsRegion, transcriptionJobName, mediaFileUri, outputBucketName, languageCode string) (model.Transcription, error) {
-	transcript, err := processTranscriptionJob(transcribeClient, s3Client, transcriptionJobName, mediaFileUri, outputBucketName, languageCode)
+func StartJob(
+	transcribeClient *transcribe.Client,
+	s3Client *s3.Client, awsRegion,
+	transcriptionJobName,
+	mediaFileUri,
+	outputBucketName,
+	languageCode string,
+) (model.Transcription, error) {
+	transcript, err := processTranscriptionJob(
+		transcribeClient,
+		s3Client,
+		transcriptionJobName,
+		mediaFileUri,
+		outputBucketName,
+		languageCode)
 	if err != nil {
 		return model.Transcription{}, fmt.Errorf("failed to process transcription job: %v", err)
 	}
@@ -127,70 +142,82 @@ func StartJob(transcribeClient *transcribe.Client, s3Client *s3.Client, awsRegio
 }
 
 func processTranscriptionJob(transcribeClient *transcribe.Client, s3Client *s3.Client, transcriptionJobName, mediaFileUri, outputBucketName, languageCode string) (model.Transcription, error) {
+	return processTranscriptionJobImpl(transcribeClient, s3Client, transcriptionJobName, mediaFileUri, outputBucketName, languageCode)
+}
 
-	_, err := transcribeClient.StartTranscriptionJob(context.TODO(), &transcribe.StartTranscriptionJobInput{
-		Media: &types.Media{
-			MediaFileUri: aws.String(mediaFileUri),
-		},
+func processTranscriptionJobImpl(transcribeClient *transcribe.Client, s3Client *s3.Client, transcriptionJobName, mediaFileUri, outputBucketName, languageCode string) (model.Transcription, error) {
+	// Create a context with a timeout that will be canceled manually once we're finished with it.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
+	defer cancel()
+
+	// Start the transcription job
+	_, err := transcribeClient.StartTranscriptionJob(ctx, &transcribe.StartTranscriptionJobInput{
 		TranscriptionJobName: aws.String(transcriptionJobName),
-		OutputBucketName:     aws.String(outputBucketName),
 		LanguageCode:         types.LanguageCode.Values(types.LanguageCode(languageCode))[0],
+		Media:                &types.Media{MediaFileUri: aws.String(mediaFileUri)},
+		OutputBucketName:     aws.String(outputBucketName),
 	})
 
 	if err != nil {
 		return model.Transcription{}, fmt.Errorf("failed to start transcription job: %v", err)
 	}
 
+	// Utilize the AWS SDK's built-in retry functionality to monitor the job's status.
 	for {
-		// Create a context with a timeout
-		ctx, cancel := context.WithTimeout(context.Background(), time.Minute*10)
-		defer cancel()
-
-		output, err := transcribeClient.GetTranscriptionJob(ctx, &transcribe.GetTranscriptionJobInput{
-			TranscriptionJobName: aws.String(transcriptionJobName),
-		})
-
-		if err != nil {
-			return model.Transcription{}, fmt.Errorf("failed to get transcription job: %v", err)
-		}
-
-		switch output.TranscriptionJob.TranscriptionJobStatus {
-		case types.TranscriptionJobStatusCompleted:
-			transcriptFileUri := *output.TranscriptionJob.Transcript.TranscriptFileUri
-			parsedUri, err := url.Parse(transcriptFileUri)
-			if err != nil {
-				return model.Transcription{}, fmt.Errorf("failed to parse transcript file URI: %v", err)
-			}
-
-			transcriptFileName := path.Base(parsedUri.Path)
-
-			getObjectOutput, err := s3Client.GetObject(context.TODO(), &s3.GetObjectInput{
-				Bucket: aws.String(outputBucketName),
-				Key:    aws.String(transcriptFileName),
+		// This select statement helps us respect the context's deadline
+		select {
+		case <-ctx.Done():
+			return model.Transcription{}, ctx.Err()
+		default:
+			// If the context hasn't been canceled or exceeded its deadline, continue checking the transcription job status
+			output, err := transcribeClient.GetTranscriptionJob(ctx, &transcribe.GetTranscriptionJobInput{
+				TranscriptionJobName: aws.String(transcriptionJobName),
 			})
 
 			if err != nil {
-				return model.Transcription{}, fmt.Errorf("failed to get object: %v", err)
+				return model.Transcription{}, fmt.Errorf("failed to get transcription job: %v", err)
 			}
 
-			defer getObjectOutput.Body.Close()
+			// Handle the job status accordingly
+			switch output.TranscriptionJob.TranscriptionJobStatus {
+			case types.TranscriptionJobStatusCompleted:
+				transcriptFileUri := *output.TranscriptionJob.Transcript.TranscriptFileUri
+				parsedUri, err := url.Parse(transcriptFileUri)
+				if err != nil {
+					return model.Transcription{}, fmt.Errorf("failed to parse transcript file URI: %v", err)
+				}
 
-			var transcript model.Transcription
+				transcriptFileName := path.Base(parsedUri.Path)
 
-			if err := json.NewDecoder(getObjectOutput.Body).Decode(&transcript); err != nil {
-				return model.Transcription{}, fmt.Errorf("failed to decode JSON: %v", err)
+				getObjectOutput, err := s3Client.GetObject(ctx, &s3.GetObjectInput{
+					Bucket: aws.String(outputBucketName),
+					Key:    aws.String(transcriptFileName),
+				})
+
+				if err != nil {
+					return model.Transcription{}, fmt.Errorf("failed to get object: %v", err)
+				}
+
+				defer getObjectOutput.Body.Close()
+
+				var transcript model.Transcription
+
+				if err := json.NewDecoder(getObjectOutput.Body).Decode(&transcript); err != nil {
+					return model.Transcription{}, fmt.Errorf("failed to decode JSON: %v", err)
+				}
+
+				return transcript, nil
+
+			case types.TranscriptionJobStatusFailed:
+				return model.Transcription{}, fmt.Errorf("transcription job failed")
+
+			case types.TranscriptionJobStatusInProgress:
+				fmt.Println("Transcription progress...")
+				time.Sleep(5 * time.Second)
+
+			default:
+				return model.Transcription{}, fmt.Errorf("unknown transcription job status: %v", output.TranscriptionJob.TranscriptionJobStatus)
 			}
-
-			return transcript, nil
-
-		case types.TranscriptionJobStatusFailed:
-			return model.Transcription{}, fmt.Errorf("transcription job failed")
-
-		case types.TranscriptionJobStatusInProgress:
-			time.Sleep(5 * time.Second)
-
-		default:
-			return model.Transcription{}, fmt.Errorf("unknown transcription job status: %v", output.TranscriptionJob.TranscriptionJobStatus)
 		}
 	}
 }
