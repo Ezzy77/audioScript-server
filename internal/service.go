@@ -42,9 +42,9 @@ func InitAwsServices(awsAccessKey,
 func StartJob(
 	transcribeClient *transcribe.Client,
 	s3Client *s3.Client, awsRegion,
+	outputBucketName,
 	transcriptionJobName,
 	mediaFileUri,
-	outputBucketName,
 	languageCode string,
 ) (model.Transcription, error) {
 	transcript, err := processTranscriptionJob(
@@ -137,10 +137,11 @@ func processTranscriptionJobImpl(transcribeClient *transcribe.Client, s3Client *
 
 			case types.TranscriptionJobStatusInProgress:
 				fmt.Println("Transcription progress...")
-				time.Sleep(5 * time.Second)
-
 			default:
-				return model.Transcription{}, fmt.Errorf("unknown transcription job status: %v", output.TranscriptionJob.TranscriptionJobStatus)
+				return model.Transcription{}, fmt.Errorf(
+					"unknown transcription job status: %v",
+					output.TranscriptionJob.TranscriptionJobStatus,
+				)
 			}
 		}
 	}

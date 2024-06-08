@@ -1,7 +1,6 @@
 package model
 
 type Job struct {
-	MediaFileURI string `json:"media_file_uri"`
-	OutputBucket string `json:"output_bucket"`
+	S3Uri        string `json:"s3_uri"`
 	LanguageCode string `json:"language_code"`
 }

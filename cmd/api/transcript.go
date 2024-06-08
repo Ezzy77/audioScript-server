@@ -16,7 +16,7 @@ import (
 
 func (app *application) createTranscriptJobHandler(ctx *gin.Context) {
 
-	jobName := "myTranscriptionJobElisio" + time.Now().Format("20060102150405")
+	jobName := "transcriptJob" + time.Now().Format("20060102150405")
 
 	var job model.Job
 	err := ctx.ShouldBindJSON(&job)
@@ -29,9 +29,9 @@ func (app *application) createTranscriptJobHandler(ctx *gin.Context) {
 		app.transcribeClient,
 		app.s3Client,
 		app.awsConfig.Region,
+		app.awsConfig.OutputBucket,
 		jobName,
-		job.MediaFileURI,
-		job.OutputBucket,
+		job.S3Uri,
 		job.LanguageCode,
 	)
 	if err != nil {
@@ -69,7 +69,7 @@ func (app *application) uploadMedia(ctx *gin.Context) {
 
 	// Upload the file to S3
 	_, err = app.s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
-		Bucket: aws.String(app.awsConfig.OutputBucket),
+		Bucket: aws.String(app.awsConfig.UploadBucket),
 		Key:    aws.String(fileName),
 		Body:   src,
 	})
@@ -93,7 +93,7 @@ func (app *application) uploadMedia(ctx *gin.Context) {
 		return
 	}
 	// Generate S3 URI
-	s3Uri := fmt.Sprintf("s3://%s/%s", app.awsConfig.OutputBucket, fileName)
+	s3Uri := fmt.Sprintf("s3://%s/%s", app.awsConfig.UploadBucket, fileName)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"url":    presignedURL,
