@@ -1,11 +1,10 @@
 package model
 
 type Profile struct {
-	UserId    string `json:"user_id,omitempty"`
+	UserId    string `json:"id,omitempty"`
 	FirstName string `json:"first_name,omitempty"`
 	LastName  string `json:"last_name,omitempty"`
 	Email     string `json:"email,omitempty"`
-	Password  string `json:"password,omitempty"`
 }
 
 type AuthRequest struct {
@@ -27,7 +26,8 @@ type RegisterResponse struct {
 }
 
 type AuthResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int    `json:"expires_in"`
+	AccessToken string  `json:"access_token"`
+	TokenType   string  `json:"token_type"`
+	ExpiresIn   int     `json:"expires_in"`
+	Profile     Profile `json:"user"`
 }

@@ -33,7 +33,7 @@ func (app *application) loginHandler(ctx *gin.Context) {
 		return
 	}
 
-	userJson, err := json.Marshal(resp.User)
+	userJson, err := json.Marshal(resp)
 	if err != nil {
 		// handle error
 		app.logger.Println("Failed to marshal user JSON")
@@ -48,7 +48,7 @@ func (app *application) loginHandler(ctx *gin.Context) {
 	}
 	// Set the access token in the response header
 	ctx.Header("Authorization", fmt.Sprintf("Bearer %s", authResponse.AccessToken))
-	ctx.JSON(http.StatusOK, resp.User)
+	ctx.JSON(http.StatusOK, authResponse)
 }
 
 func (app *application) logoutHandler(ctx *gin.Context) {
@@ -93,7 +93,7 @@ func (app *application) registerHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to parse response"})
 		return
 	}
-	client.From("Profiles").Insert(registerResponse, true, "", "", "")
+	//client.From("Profiles").Insert(registerResponse, true, "", "", "")
 
-	ctx.JSON(http.StatusOK, registerResponse)
+	ctx.JSON(http.StatusOK, userJson)
 }

@@ -137,6 +137,7 @@ func processTranscriptionJobImpl(transcribeClient *transcribe.Client, s3Client *
 
 			case types.TranscriptionJobStatusInProgress:
 				fmt.Println("Transcription progress...")
+				time.Sleep(5 * time.Second)
 			default:
 				return model.Transcription{}, fmt.Errorf(
 					"unknown transcription job status: %v",

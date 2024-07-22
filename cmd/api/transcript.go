@@ -11,6 +11,8 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path"
+	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -20,7 +22,9 @@ func (app *application) createTranscriptJobHandler(ctx *gin.Context) {
 
 	var job model.Job
 	err := ctx.ShouldBindJSON(&job)
+	fmt.Println("job is here...", job)
 	if err != nil {
+		fmt.Println("Error binding request body: %v", err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -35,6 +39,7 @@ func (app *application) createTranscriptJobHandler(ctx *gin.Context) {
 		job.LanguageCode,
 	)
 	if err != nil {
+		fmt.Println("Error starting job: %v", err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -65,7 +70,8 @@ func (app *application) uploadMedia(ctx *gin.Context) {
 	}(src)
 
 	// Create a unique file name
-	fileName := fmt.Sprintf("%d%s", time.Now().UnixNano(), path.Ext(file.Filename))
+	originalName := strings.TrimSuffix(file.Filename, filepath.Ext(file.Filename))
+	fileName := fmt.Sprintf("%s_%d%s", originalName, time.Now().UnixNano(), path.Ext(file.Filename))
 
 	// Upload the file to S3
 	_, err = app.s3Client.PutObject(context.TODO(), &s3.PutObjectInput{

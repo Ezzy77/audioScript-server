@@ -16,9 +16,9 @@ func (app *application) routes() *gin.Engine {
 	router.POST("/v1/api/upload", app.uploadMedia)
 
 	// user auth
-	router.POST("/v1/api/auth/login", app.loginHandler)
-	router.POST("/v1/api/auth/logout", app.logoutHandler)
-	router.POST("/v1/api/auth/register", app.registerHandler)
+	//router.POST("/v1/api/auth/login", app.loginHandler)
+	//router.POST("/v1/api/auth/logout", app.logoutHandler)
+	//router.POST("/v1/api/auth/register", app.registerHandler)
 
 	return router
 }
