@@ -21,14 +21,23 @@ jobs:
         with:
           go-version: '1.22.0'
 
+      - name: Show directory structure
+        run: ls -R
+
+      - name: Show current directory
+        run: pwd
+
       - name: Install dependencies
         run: go mod tidy
+        working-directory: ./cmd/api
 
 #      - name: Run tests
 #        run: go test ./...
+#        working-directory: ./cmd/api
 
       - name: Build project
-        run: GOOS=linux GOARCH=amd64 go build -o audioScriptServer
+        run: GOOS=linux GOARCH=amd64 go build -o audioscript ./cmd/api
+        working-directory: ./
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,8 +53,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "audioScriptServer"
-          target: "~/audioScriptServer"
+          source: "audioscript"
+          target: "~/audioscript"
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.5
@@ -54,6 +63,6 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            pkill audioScriptServer || true
-            nohup ./audioScriptServer &
+            pkill myapp || true
+            nohup ./myapp &
 
