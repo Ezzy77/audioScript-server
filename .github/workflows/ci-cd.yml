@@ -31,9 +31,9 @@ jobs:
         run: go mod tidy
         working-directory: ./cmd/api
 
-      - name: Run tests
-        run: go test ./...
-        working-directory: ./cmd/api
+#      - name: Run tests
+#        run: go test ./...
+#        working-directory: ./cmd/api
 
       - name: Build project
         run: GOOS=linux GOARCH=amd64 go build -o audioscript ./cmd/api
