@@ -39,11 +39,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	supabaseConfig, err := internal.LoadSupabaseConfig()
-	if err != nil {
-		fmt.Printf("Error loading Supabase config: %v", err)
-		os.Exit(1)
-	}
+	//supabaseConfig, err := internal.LoadSupabaseConfig()
+	//if err != nil {
+	//	fmt.Printf("Error loading Supabase config: %v", err)
+	//	os.Exit(1)
+	//}
 
 	// creating aws s3 and transcribeClient
 	s3Client, transcribeClient, err := internal.InitAwsServices(
@@ -67,10 +67,10 @@ func main() {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	app := &application{
-		config:           cfg,
-		logger:           logger,
-		awsConfig:        awsConfig,
-		supabaseConfig:   supabaseConfig,
+		config:    cfg,
+		logger:    logger,
+		awsConfig: awsConfig,
+		//supabaseConfig:   supabaseConfig,
 		s3Client:         s3Client,
 		transcribeClient: transcribeClient,
 	}

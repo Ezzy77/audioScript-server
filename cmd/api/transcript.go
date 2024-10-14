@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/gin-gonic/gin"
-	"mime/multipart"
 	"net/http"
 	"path"
 	"path/filepath"
@@ -62,12 +61,12 @@ func (app *application) uploadMedia(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	defer func(src multipart.File) {
-		err := src.Close()
-		if err != nil {
-
-		}
-	}(src)
+	//defer func(src multipart.File) {
+	//	err := src.Close()
+	//	if err != nil {
+	//
+	//	}
+	//}(src)
 
 	// Create a unique file name
 	originalName := strings.TrimSuffix(file.Filename, filepath.Ext(file.Filename))
